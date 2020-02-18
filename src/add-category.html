@@ -1,0 +1,122 @@
+<template>
+  <div class="no-selection text-center">
+    <h2>Test</h2>
+  </div>
+
+
+
+  <div class="form-group">
+    <div class="row">
+      <div class="col-sm-3">
+        <label>CatId: </label>
+      </div>
+      <div class="col-sm-6">
+        <div class="input-group">
+          <label>${catId}</label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <div class="row">
+      <div class="col-sm-3">
+        <label>Name: </label>
+      </div>
+      <div class="col-sm-6">
+        <div class="input-group">
+          <input type="text" value.bind="name" />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <div class="row">
+      <div class="col-sm-3">
+        <label>Level: </label>
+      </div>
+      <div class="col-sm-6">
+        <div class="input-group">
+          <select value.bind="level">
+            <option value="0">0</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <div class="row">
+      <div class="col-sm-3">
+        <label>Parent: </label>
+      </div>
+      <div class="col-sm-6">
+        <div class="input-group">
+          <select value.bind="parentId">
+            <option value="0">0</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <div class="row">
+      <div class="col-sm-3">
+        <label>Restricted: </label>
+      </div>
+      <div class="col-sm-6">
+        <div class="input-group">
+          <input type="checkbox" checked.bind="restricted" />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <div class="row">
+      <div class="col-sm-3">
+        <label>Image: </label>
+      </div>
+      <div class="col-sm-6">
+        <div class="input-group">
+          <input type="text" value.bind="image" />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <div class="row">
+      <div class="col-sm-3">
+        <label>Order id: </label>
+      </div>
+      <div class="col-sm-6">
+        <div class="input-group">
+          <input class="text-right" type="text" value.bind="orderId" readonly="readonly" />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <div class="row">
+      <div class="col-sm-3"></div>
+      <div class="col-sm-6">
+        <button type="button"
+                class="btn btn-primary text-right"
+                style="border: none;"
+                click.delegate="save()">
+          Save
+        </button>
+      </div>
+    </div>
+  </div>
+</template>
+

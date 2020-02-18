@@ -1,0 +1,33 @@
+<template>
+  <div class="col-sm-3">
+      <div class="row">
+        <a route-href="route: add-category" class="col-sm-3 fa fa-plus text-right"></a>
+      </div>
+  </div>
+
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">Name</th>
+        <th scope="col">Level</th>
+        <th scope="col">Restricted</th>
+        <th scope="col">Order id</th>
+        <th scope="col">Parent id</th>
+        <th scope="col">Image</th>
+      </tr>
+    </thead>
+    <tbody repeat.for="cat of categories">
+      <tr>
+        <td>${cat.catId}</td>
+        <td>${cat.name}</td>
+        <td>${cat.level}</td>
+        <td>${cat.restricted ? 'Yes' : 'No'}</td>
+        <td>${cat.orderId}</td>
+        <td>${cat.parentId}</td>
+        <td><img src="${cat.image}" width="50" height="50" /></td>
+      </tr>
+    </tbody>
+  </table>
+
+</template>
