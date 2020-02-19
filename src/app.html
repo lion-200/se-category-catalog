@@ -1,21 +1,21 @@
 <template>
-  <require from="./styles.css"></require>
   <require from="./catalog-list"></require>
 
-  <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+  <nav-bar router.bind="router"></nav-bar>
+  <!--<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
     <div class="navbar-header">
-      <a class="navbar-brand" href="#">
-        <i class="fa fa-user"></i>
-        <span>Categories</span>
+      <a class="navbar-brand"  route-href="route: add-category">
+        <i class="fa fa-plus"></i>
+        <span>Add category</span>
       </a>
     </div>
-  </nav>
+  </nav>-->
 
-  <loading-indicator loading.bind="router.isNavigating"></loading-indicator>
+  <loader loading.bind="loading || router.isNavigating & debounce:350"></loader>
 
   <div class="container">
     <div class="row">
-      <catalog-list class="col-md-12"></catalog-list>     
+      <catalog-list class="col-md-12"></catalog-list>
       <router-view class="col-md-12"></router-view>
     </div>
   </div>

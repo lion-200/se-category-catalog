@@ -17,7 +17,7 @@ a:focus {
 }
 
 .category-list {
-  border: 1px solid #ddd;
+  border: none;
   padding: 10px;
 }
 

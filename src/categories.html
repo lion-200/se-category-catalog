@@ -1,7 +1,7 @@
 <template>
-  <div class="col-sm-3">
+  <div class="col-sm-12">
       <div class="row">
-        <a route-href="route: add-category" class="col-sm-3 fa fa-plus text-right"></a>
+          <h4>Level ${level} categories</h4>
       </div>
   </div>
 
@@ -13,13 +13,13 @@
         <th scope="col">Level</th>
         <th scope="col">Restricted</th>
         <th scope="col">Order id</th>
-        <th scope="col">Parent id</th>
+        <th scope="col">Parent</th>
         <th scope="col">Image</th>
       </tr>
     </thead>
-    <tbody repeat.for="cat of categories">
-      <tr>
-        <td>${cat.catId}</td>
+    <tbody>
+      <tr repeat.for="cat of categories">
+        <td>${cat.id}</td>
         <td>${cat.name}</td>
         <td>${cat.level}</td>
         <td>${cat.restricted ? 'Yes' : 'No'}</td>

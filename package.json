@@ -10,11 +10,16 @@
   "dependencies": {
     "aurelia-animator-css": "^1.0.4",
     "aurelia-bootstrapper": "^2.3.3",
+    "aurelia-dialog": "^2.0.0",
+    "aurelia-i18n": "^3.0.0-beta.7",
+    "aurelia-validation": "^1.6.0",
     "bootstrap": "^4.4.1",
     "firebase": "^7.6.2",
     "firebase-admin": "^8.9.0",
     "firebase-functions": "^3.3.0",
     "font-awesome": "^4.7.0",
+    "i18next-xhr-backend": "^3.2.0",
+    "izitoast": "^1.4.0",
     "nprogress": "^0.2.0"
   },
   "devDependencies": {

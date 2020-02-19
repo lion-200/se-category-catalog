@@ -4,11 +4,11 @@ import { autoinject, PLATFORM } from 'aurelia-framework';
 @autoinject()
 export class App {
   router: Router;
+  private loading = false;
 
   constructor() { }
 
   configureRouter(config: RouterConfiguration, router: Router) {
-    console.log('test');
     config.title = 'SE Category Catalog';
     config.map([
       { route: ['', 'home'], name: 'home', moduleId: PLATFORM.moduleName('init'), title: 'Catalog' },            

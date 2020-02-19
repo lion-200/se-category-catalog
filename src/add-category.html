@@ -1,18 +1,18 @@
 <template>
   <div class="no-selection text-center">
-    <h2>Test</h2>
+    <h2>Add category</h2>
   </div>
 
-
+  <loader mode="tiny" loading.bind="loading"></loader>
 
   <div class="form-group">
     <div class="row">
       <div class="col-sm-3">
-        <label>CatId: </label>
+        <label>Id: </label>
       </div>
       <div class="col-sm-6">
         <div class="input-group">
-          <label>${catId}</label>
+          <label>${categoryPrefix + id}</label>
         </div>
       </div>
     </div>
@@ -21,11 +21,13 @@
   <div class="form-group">
     <div class="row">
       <div class="col-sm-3">
-        <label>Name: </label>
+        <label>Category name: </label>
       </div>
       <div class="col-sm-6">
         <div class="input-group">
-          <input type="text" value.bind="name" />
+          <input type="text" class="form-control" 
+                 placeholder="Category name"
+                 value.bind="name & validate" />
         </div>
       </div>
     </div>
@@ -38,13 +40,12 @@
       </div>
       <div class="col-sm-6">
         <div class="input-group">
-          <select value.bind="level">
+          <select value.bind="level & validate" class="form-control">
             <option value="0">0</option>
             <option value="1">1</option>
             <option value="2">2</option>
             <option value="3">3</option>
             <option value="4">4</option>
-            <option value="5">5</option>
           </select>
         </div>
       </div>
@@ -58,7 +59,7 @@
       </div>
       <div class="col-sm-6">
         <div class="input-group">
-          <select value.bind="parentId">
+          <select value.bind="parentId & validate" class="form-control">
             <option value="0">0</option>
           </select>
         </div>
@@ -86,7 +87,7 @@
       </div>
       <div class="col-sm-6">
         <div class="input-group">
-          <input type="text" value.bind="image" />
+          <input type="text" value.bind="image" class="form-control" />
         </div>
       </div>
     </div>
@@ -99,7 +100,7 @@
       </div>
       <div class="col-sm-6">
         <div class="input-group">
-          <input class="text-right" type="text" value.bind="orderId" readonly="readonly" />
+          <input class="text-right form-control" type="text" value.bind="orderId" readonly="readonly" />
         </div>
       </div>
     </div>
