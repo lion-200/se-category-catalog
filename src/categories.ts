@@ -3,6 +3,7 @@ import { EventAggregator } from 'aurelia-event-aggregator';
 import { CategoryUpdated, CategoryViewed, CategoryCreated } from './messages';
 import { areEqual } from './utility';
 import * as firebase from 'firebase';
+import { CategoryService } from './services/category-service';
 
 @autoinject()
 export class Categories {
@@ -11,28 +12,15 @@ export class Categories {
   private categories;
   private selectedId;
 
-  constructor(private ea: EventAggregator) { }
+  constructor(private categoryService: CategoryService) { }
 
   async activate(params) {    
     this.level = params.level;
 
     this.db = firebase.firestore();
-    this.categories = await this.getCategoriesByLevel(this.level);
+    this.categories = await this.categoryService.getCategoriesByLevel(this.level);
   }
 
-  async getCategoriesByLevel(level) {    
-    let catCol = this.db.collection("categories");    
-    let list = catCol.where("level", "==", parseInt(level));
-
-    let cats = [];
-
-    await list.get().then(function (querySnapshot) {      
-      querySnapshot.forEach(function (doc) {
-        cats.push(doc.data());
-      });      
-    });  
-
-    return cats;
-  }
+  
 }
 

@@ -1,33 +1,41 @@
 <template>
-  <div class="col-sm-12">
-      <div class="row">
-          <h4>Level ${level} categories</h4>
+  <div class="main-content">
+    <div class="col-sm-12">
+      <div class="row alert alert-primary">
+        <h3>Level ${level} categories</h3>
       </div>
+    </div>
+
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col">Name</th>
+          <!--<th scope="col">Level</th>-->
+          <th scope="col">Restricted</th>
+          <th scope="col">Order id</th>
+          <th scope="col">Parent</th>
+          <th scope="col">Image</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr repeat.for="cat of categories">
+          <td>${cat.id}</td>
+          <td>${cat.name}</td>
+          <!--<td>${cat.level}</td>-->
+          <td>${cat.restricted ? 'Yes' : 'No'}</td>
+          <td>${cat.orderId}</td>
+          <td>${cat.parentId}</td>
+          <td>
+            <div if.bind="cat.image">
+              <img src="${cat.image}" width="50" height="50" />
+            </div>
+            <div if.bind="!cat.image">
+              <span>N/A</span>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
   </div>
-
-  <table class="table table-striped">
-    <thead>
-      <tr>
-        <th scope="col">#</th>
-        <th scope="col">Name</th>
-        <th scope="col">Level</th>
-        <th scope="col">Restricted</th>
-        <th scope="col">Order id</th>
-        <th scope="col">Parent</th>
-        <th scope="col">Image</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr repeat.for="cat of categories">
-        <td>${cat.id}</td>
-        <td>${cat.name}</td>
-        <td>${cat.level}</td>
-        <td>${cat.restricted ? 'Yes' : 'No'}</td>
-        <td>${cat.orderId}</td>
-        <td>${cat.parentId}</td>
-        <td><img src="${cat.image}" width="50" height="50" /></td>
-      </tr>
-    </tbody>
-  </table>
-
 </template>

@@ -2,5 +2,6 @@
   "addCategoryNameRequired": "Please enter a name for the category",
   "addCategoryNameExists": "This category name already exists in this level",
   "addCategoryLevelRequired": "Please select a level for the category",
-  "addCategoryFailure": "Failed to add category {{name}} to level {{level}}"
+  "addCategoryFailure": "Failed to add category {{name}} to level {{level}}",
+  "addCategoryParentRequired":  "Please select a parent category"
 }

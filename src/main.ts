@@ -6,6 +6,7 @@ import 'font-awesome/css/font-awesome.css';
 import 'izitoast/dist/css/iziToast.css';
 import './styles/toast.css';
 import './styles/main.css';
+import './styles/navbar.css';
 
 import { initFirebase } from './common/firebase';
 

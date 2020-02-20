@@ -1,7 +1,7 @@
-import { autoinject } from 'aurelia-framework';
-import * as firebase from 'firebase';
+import { autoinject, bindable } from 'aurelia-framework';
 import { ValidationControllerFactory, ControllerValidateResult, ValidationRules } from 'aurelia-validation';
 import { ToastService, ToastMessage } from 'services/toast-service';
+import { CategoryService } from 'services/category-service';
 import { BootstrapFormRenderer } from 'resources/bootstrap-form-renderer';
 import { I18N } from 'aurelia-i18n';
 import { AppRouter } from 'aurelia-router';
@@ -12,18 +12,18 @@ export class AddCategory {
 
   private name;
   private parentId;
-  private level;
+  @bindable level;
+  private parentCats : ICategory[];
   private restricted;
   private image;
-  private db;
   private orderId;
   private id;
-  private categoryPrefix = "category";
+  
   private validationController;
   private renderer;
   private loading = false;
 
-  constructor(private toast: ToastService, private controllerFactory: ValidationControllerFactory, private i18n: I18N, private router: AppRouter) {
+  constructor(private toast: ToastService, private categoryService: CategoryService, private controllerFactory: ValidationControllerFactory, private i18n: I18N, private router: AppRouter) {
       this.validationController = controllerFactory.createForCurrentScope();
 
       this.renderer = new BootstrapFormRenderer();
@@ -37,17 +37,38 @@ export class AddCategory {
   }
 
   async bind() {
-    this.loading = true;
-
-    this.db = firebase.firestore();
+    this.loading = true;   
 
     this.setNewId();
     this.setNewOrderId();
-    this.image = "";    
+    this.image = "";
+    this.parentCats = [];
 
     this.createValidationRules();
         
     this.loading = false;
+  }
+
+  async levelChanged(newVal) {
+    this.parentCats = [];
+
+    if (newVal > 0) {      
+      // get parent categories
+      let cats = await this.categoryService.getCategoriesByLevel(newVal - 1);
+      
+      if (cats) {
+        cats.forEach(x => this.parentCats.push({ id: x.id, name: x.name }));
+      }
+    }
+  }
+
+  async categoryAlreadyExists(name, level) {
+    let cats = await this.categoryService.getCategoriesByNameAndLevel(name, level)
+    if (cats && cats.length > 0) {
+      return true;
+    }
+
+    return false;
   }
 
   private createValidationRules() {
@@ -56,15 +77,17 @@ export class AddCategory {
       .required()
       .withMessageKey('errors:addCategoryNameRequired')
       .then()
-      .satisfies((value: any, object: AddCategory) => {
-        //const amount = parseFloat(value);
-
-        return true;//(amount <= object);
+      .satisfies(async(value: any, object: AddCategory) => {        
+        let catExists = await this.categoryAlreadyExists(value, object.level);        
+        return !catExists;
       })
       .withMessageKey('errors:addCategoryNameExists')
       .ensure('level')
       .required()
       .withMessageKey('errors:addCategoryLevelRequired')
+      .ensure('parentId')
+      .required()
+      .withMessageKey('errors:addCategoryParentRequired')
       .rules;
 
     this.validationController.addObject(this, rules);
@@ -75,29 +98,11 @@ export class AddCategory {
   }
 
   async setNewId() {
-    let categories = this.db.collection("categories");
-    let newId = 1;
-    await categories.orderBy("id", "desc").limit(1).get().then(function (querySnapshot) {
-      querySnapshot.forEach(function (doc) {
-        var lastId = doc.data() && doc.data().id ? doc.data().id : 0;
-        newId = parseInt(lastId)+1;
-      })
-    });
-
-    this.id = newId;
+    this.id = await this.categoryService.generateNewCategoryId();
   }
 
   async setNewOrderId() {
-    let categories = this.db.collection("categories");
-    let newOrderId = 100;
-    await categories.orderBy("orderId", "desc").limit(1).get().then(function (querySnapshot) {
-      querySnapshot.forEach(function (doc) {
-        var lastOrderId = doc.data().orderId;
-        newOrderId = parseInt(lastOrderId) + 100;
-      })
-    });
-
-    this.orderId = newOrderId;
+    this.orderId = await this.categoryService.generateNewOrderId();
   }
 
   async save() {
@@ -122,49 +127,21 @@ export class AddCategory {
     }
 
     if (validationResult.valid) {
-      let catId = this.categoryPrefix + this.id;
-      let newCat = this.db.collection("categories").doc(catId);
-      let name = this.name;
-      let level = this.level;
-
-      newCat.set({
-        id: this.id,
+      let cat = {
+        id: parseInt(this.id),
         name: this.name,
-        level: this.level,
-        parentId: this.parentId,
+        level: parseInt(this.level),
+        parentId: parseInt(this.parentId),
         restricted: this.restricted,
         image: this.image,
-        orderId: this.orderId
-      }).then(function (docRef) {
-        console.log(docRef);
-        const toast = new ToastMessage();
+        orderId: parseInt(this.orderId)
+      } as ICategory;
 
-        toast.message = i18n.tr('addCategorySuccess', {
-          name: name,
-          level: level,
-          ns: 'notifications'
-        });
-
-        toastService.success(toast);
-
-        loading = false;
-
-        router.navigateToRoute('categories', { level: level });
-      })
-      .catch(function (error) {
-        console.log(error);
-        const toast = new ToastMessage();
-
-        toast.message = i18n.tr('addCategoryFailure', {
-          name: name,
-          level: level,
-          ns: 'errors'
-        });
-
-        toastService.error(toast);
-
-        loading = false;
-      });
+      let addResult = await this.categoryService.addCategory(cat);
+      
+      if (addResult) {
+        router.navigateToRoute('categories', { level: cat.level });
+      }
     }
 
     loading = false;    

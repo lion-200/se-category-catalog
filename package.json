@@ -20,13 +20,15 @@
     "font-awesome": "^4.7.0",
     "i18next-xhr-backend": "^3.2.0",
     "izitoast": "^1.4.0",
-    "nprogress": "^0.2.0"
+    "jquery": "^3.4.1",
+    "select2": "^4.0.12"
   },
   "devDependencies": {
     "aurelia-cli": "^1.2.3",
     "aurelia-testing": "^1.0.0",
     "aurelia-tools": "^2.0.0",
     "gulp": "^4.0.0",
+    "@types/jquery": "^3.3.31",
     "minimatch": "^3.0.4",
     "through2": "^3.0.0",
     "vinyl-fs": "^3.0.3",
@@ -35,6 +37,7 @@
     "ts-node": "^7.0.1",
     "@types/node": "^10.11.6",
     "@types/lodash": "^4.14.117",
+    "@types/select2": "^4.0.48",
     "@types/webpack": "^4.4.15",
     "typescript": "^3.1.2",
     "gulp-rename": "^1.4.0",

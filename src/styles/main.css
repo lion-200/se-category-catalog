@@ -50,3 +50,7 @@ li.list-group-item > a {
 li.list-group-item.active > a {
   color: white;
 }
+
+.main-content {
+    margin-top: 60px;
+}
