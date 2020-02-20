@@ -18,7 +18,7 @@ export class Categories {
     this.level = params.level;
 
     this.db = firebase.firestore();
-    this.categories = await this.categoryService.getCategoriesByLevel(this.level);
+    this.categories = await this.categoryService.getCategoriesByLevel(this.level, true);
   }
 
   

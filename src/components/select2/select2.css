@@ -19,3 +19,8 @@
   border: 1px solid #115e65;
   padding: 2px 10px;
 }
+
+.select2-container {
+  display: block !important;
+  width: 100% !important;
+}

@@ -21,7 +21,7 @@
     "i18next-xhr-backend": "^3.2.0",
     "izitoast": "^1.4.0",
     "jquery": "^3.4.1",
-    "select2": "^4.0.12"
+    "select2": "^4.0.13"
   },
   "devDependencies": {
     "aurelia-cli": "^1.2.3",

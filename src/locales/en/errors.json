@@ -3,5 +3,7 @@
   "addCategoryNameExists": "This category name already exists in this level",
   "addCategoryLevelRequired": "Please select a level for the category",
   "addCategoryFailure": "Failed to add category {{name}} to level {{level}}",
-  "addCategoryParentRequired":  "Please select a parent category"
+  "addCategoryParentRequired": "Please select a parent category",
+  "updateCategoryFailure": "Failed to update category {{name}}",
+  "categoryNotFound" :  "Category {{id}} not found!"
 }

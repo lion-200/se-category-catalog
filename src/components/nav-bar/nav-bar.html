@@ -14,8 +14,8 @@
         <div class="col-sm-1"></div>
           <ul class="nav nav-pills nav-fill category-list col-sm-6">
             <li repeat.for="l of levels" class="nav-item">
-              <a class="nav-link ${level === l.level ? 'active' : ''}" route-href="route: categories; params.bind: { level:l.level }" title="Level ${l.level} categories">
-                <h4>Level ${l.level}</h4>
+              <a class="nav-link btn btn-lg" route-href="route: categories; params.bind: { level:l.level }" title="Level ${l.level} categories">
+                <span>Level ${l.level}</span>
               </a>
             </li>
           </ul>

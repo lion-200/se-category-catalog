@@ -1,7 +1,7 @@
 <template>
   <div class="main-content">
     <div class="no-selection text-center">
-      <h2>Add category</h2>
+      <h2>Edit category</h2>
     </div>
 
     <loader mode="tiny" loading.bind="loading"></loader>
@@ -59,12 +59,12 @@
           <label>Parent: </label>
         </div>
         <div class="col-sm-6">
-            <select2>
-              <select value.bind="parentId & validate" class="form-control chosen-select">
-                <option if.bind="level === 0" value="0">No parent</option>
-                <option repeat.for="pCat of parentCats" model.bind="pCat.id">${pCat.name}</option>
-              </select>
-            </select2>
+          <select2>
+            <select value.bind="parentId & validate" class="form-control">
+              <option if.bind="level === 0" value="0">No parent</option>
+              <option repeat.for="pCat of parentCats" model.bind="pCat.id">${pCat.name}</option>
+            </select>
+          </select2>
         </div>
       </div>
     </div>

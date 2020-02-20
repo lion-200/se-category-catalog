@@ -1,3 +1,4 @@
 {
-  "addCategorySuccess": "Category {{name}} is added successfully to level {{level}}"
+  "addCategorySuccess": "Category {{name}} is added successfully to level {{level}}",
+  "updateCategorySuccess": "Category {{name}} is updated successfully"
 }

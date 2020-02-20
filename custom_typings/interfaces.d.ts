@@ -6,4 +6,5 @@
   name: string;
   restricted: boolean;
   image: string;
+  parentData: any;
 }

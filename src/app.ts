@@ -14,7 +14,7 @@ export class App {
       { route: ['', 'home'], name: 'home', moduleId: PLATFORM.moduleName('init'), title: 'Catalog' },            
       { route: 'categories/:level', moduleId: PLATFORM.moduleName('categories'), name: 'categories' },
       { route: 'add-category', moduleId: PLATFORM.moduleName('add-category'), name: 'add-category' },
-      //{ route: 'testcategory/:level', moduleId: PLATFORM.moduleName('./testcategory', 'testcategory'), name: 'testcategory', href: 'testcategory' }
+      { route: 'edit-category/:id', moduleId: PLATFORM.moduleName('edit-category'), name: 'edit-category' }
     ]);
 
     this.router = router;

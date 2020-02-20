@@ -13,10 +13,15 @@ export class CategoryService {
     this.db = firebase.firestore();
   }  
 
-  async getCategoriesByNameAndLevel(name, level) {    
+  async getCategoriesByNameAndLevel(name, level, id) {    
     let categories = this.db.collection('categories');
 
     let list = categories.where("level", "==", parseInt(level)).where("name", "==", name);
+
+    // as != is not supported we check for id's greater than and less then current id to see if the name already exists
+    if (id) {
+      list = list.where("id", "<", id).where("id", ">", id);
+    }
 
     let cats = [];
 
@@ -92,14 +97,68 @@ export class CategoryService {
     });
   }
 
+  async updateCategory(cat) {
+    const i18n = this.i18n;
+    const toastService = this.toast;
+
+    let key = this.categoryPrefix + cat.id;
+    let updateCat = this.db.collection("categories").doc(key);
+
+    return updateCat.set(cat).then(function () {
+      const toast = new ToastMessage();
+
+      toast.message = i18n.tr('updateCategorySuccess', {
+        name: cat.name,
+        level: cat.level,
+        ns: 'notifications'
+      });
+
+      toastService.success(toast);
+
+      return true;
+    }).catch(function (error) {
+      console.log(error);
+      const toast = new ToastMessage();
+
+      toast.message = i18n.tr('updateCategoryFailure', {
+        name: cat.name,
+        level: cat.level,
+        ns: 'errors'
+      });
+
+      toastService.error(toast);
+
+      return false;
+    });
+  }
+
   async getCategoryById(id) {
-    let catCol = this.db.collection("categories");
-    let cat = await catCol.doc(this.categoryPrefix + id);
+    const i18n = this.i18n;
+    const toastService = this.toast;
+
+    let catCol = this.db.collection("categories");    
+    let catQ = catCol.doc(this.categoryPrefix + id);
+    let cat;
+    await catQ.get().then(function (doc) {
+      if (doc.exists) {
+        cat = doc.data();
+      } else {
+        const toast = new ToastMessage();
+
+        toast.message = i18n.tr('categoryNotFound', {
+          id: id,
+          ns: 'errors'
+        });
+
+        toastService.error(toast);
+      }
+    });    
 
     return cat;
   }
 
-  async getCategoriesByLevel(level) {
+  async getCategoriesByLevel(level, includeParentData = false) {
+    const categoryPrefix = this.categoryPrefix;
     let catCol = this.db.collection("categories");
     let list = catCol.where("level", "==", parseInt(level));
 
@@ -107,7 +166,16 @@ export class CategoryService {
 
     await list.get().then(function (querySnapshot) {
       querySnapshot.forEach(function (doc) {
-        cats.push(doc.data());
+        let cat = doc.data();
+        if (level > 0 && cat.parentId > 0 && includeParentData) {                    
+          catCol.doc(categoryPrefix + cat.parentId).get().then(function (pDoc) {
+            if (pDoc.exists) {
+              cat.parentData = pDoc.data();
+            }            
+          });
+        }
+
+        cats.push(cat);
       });
     });
 

@@ -16,6 +16,7 @@
           <th scope="col">Order id</th>
           <th scope="col">Parent</th>
           <th scope="col">Image</th>
+          <th></th>
         </tr>
       </thead>
       <tbody>
@@ -25,7 +26,7 @@
           <!--<td>${cat.level}</td>-->
           <td>${cat.restricted ? 'Yes' : 'No'}</td>
           <td>${cat.orderId}</td>
-          <td>${cat.parentId}</td>
+          <td>${cat.parentId > 0 && cat.parentData ? cat.parentData.name : 'N/A'}</td>
           <td>
             <div if.bind="cat.image">
               <img src="${cat.image}" width="50" height="50" />
@@ -33,6 +34,11 @@
             <div if.bind="!cat.image">
               <span>N/A</span>
             </div>
+          </td>
+          <td>
+            <a class="btn btn-info" route-href="route: edit-category; params.bind: { id:cat.id }" title="Edit">
+              <span>Edit</span>
+            </a>
           </td>
         </tr>
       </tbody>
