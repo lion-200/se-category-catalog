@@ -18,6 +18,7 @@ export class EditCategory {
   private image;
   private orderId;
   private id;
+  private enabled;
   
   private validationController;
   private renderer;
@@ -41,6 +42,7 @@ export class EditCategory {
     
     this.name = cat.name;
     this.level = cat.level.toString();
+    this.enabled = cat.enabled;
     
     this.restricted = cat.restricted;
     this.orderId = cat.orderId;
@@ -143,7 +145,8 @@ export class EditCategory {
         parentId: parseInt(this.parentId),
         restricted: this.restricted,
         image: this.image,
-        orderId: parseInt(this.orderId)
+        orderId: parseInt(this.orderId),
+        enabled: this.enabled
       } as ICategory;
 
       let updateResult = await this.categoryService.updateCategory(cat);

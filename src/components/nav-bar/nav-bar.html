@@ -10,24 +10,20 @@
       <button class="navbar-toggler collapsed" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
-      <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <div class="col-sm-1"></div>
-          <ul class="nav nav-pills nav-fill category-list col-sm-6">
-            <li repeat.for="l of levels" class="nav-item">
-              <a class="nav-link btn btn-lg" route-href="route: categories; params.bind: { level:l.level }" title="Level ${l.level} categories">
-                <span>Level ${l.level}</span>
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div class="col-sm-3">
-          <div class="text-right">
-            <a class="navbar-brand" route-href="route: add-category">
-              <i class="fa fa-plus"></i>
-              <span>Add category</span>
+      <div class="collapse navbar-collapse col-sm-12" id="navbarSupportedContent">        
+        <ul class="nav nav-pills nav-fill category-list col-sm-6">
+          <li repeat.for="l of levels" class="nav-item">
+            <a class="nav-link btn btn-lg" route-href="route: categories; params.bind: { level:l.level }" title="Level ${l.level} categories">
+              <span>Level ${l.level}</span>
             </a>
-          </div>
-        </div>
+          </li>
+        </ul>
+        <ul class="navbar-nav col-sm-6">
+          <li class="nav-item" repeat.for="row of router.navigation">
+            <a class="nav-link" href.bind="row.href"><i if.bind="row.title == 'Add category' || row.title == 'Add proposal'" class="fa fa-plus"></i> ${row.title & t}</a>
+          </li>
+        </ul>
+      </div>
     </div>
   </nav>
 </template>

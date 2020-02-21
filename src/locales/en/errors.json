@@ -5,5 +5,10 @@
   "addCategoryFailure": "Failed to add category {{name}} to level {{level}}",
   "addCategoryParentRequired": "Please select a parent category",
   "updateCategoryFailure": "Failed to update category {{name}}",
-  "categoryNotFound" :  "Category {{id}} not found!"
+  "categoryNotFound": "Category {{id}} not found!",
+  "addCategoryProposalFromRequired": "Please enter who creates the proposal",
+  "addCategoryProposalFailure": "Failed to add category proposal {{name}} with level {{level}}",
+  "addCategoryProposalMessageMaxLength": "Max length reached for message field",
+  "categoryProposalNotFound": "Category proposal not found",
+  "categoryProposalStatusChangeFailure":  "Category proposal status change failed"
 }

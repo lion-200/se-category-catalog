@@ -1,63 +1,60 @@
-import { autoinject, bindable } from 'aurelia-framework';
+﻿import { autoinject, bindable } from 'aurelia-framework';
 import { ValidationControllerFactory, ControllerValidateResult, ValidationRules } from 'aurelia-validation';
 import { ToastService, ToastMessage } from 'services/toast-service';
 import { CategoryService } from 'services/category-service';
 import { BootstrapFormRenderer } from 'resources/bootstrap-form-renderer';
 import { I18N } from 'aurelia-i18n';
 import { AppRouter } from 'aurelia-router';
+import moment from 'moment';
 
 @autoinject()
-export class AddCategory {
+export class AddCategoryProposal {
   routeConfig;
 
+  private from;
   private name;
   private parentId;
   @bindable level;
-  private parentCats : ICategory[];
+  private parentCats: ICategory[];
   private restricted;
   private image;
-  private orderId;
-  private id;
-  private enabled;
-  
+  private message;
+
   private validationController;
   private renderer;
   private loading = false;
 
   constructor(private toast: ToastService, private categoryService: CategoryService, private controllerFactory: ValidationControllerFactory, private i18n: I18N, private router: AppRouter) {
-      this.validationController = controllerFactory.createForCurrentScope();
+    this.validationController = controllerFactory.createForCurrentScope();
 
-      this.renderer = new BootstrapFormRenderer();
-      this.validationController.addRenderer(this.renderer);      
+    this.renderer = new BootstrapFormRenderer();
+    this.validationController.addRenderer(this.renderer);
   }
 
   activate(params, routeConfig) {
     this.parentId = 0;
     this.level = 0;
     this.restricted = false;
-    this.enabled = true;
   }
 
   async bind() {
-    this.loading = true;   
+    this.loading = true;
 
-    this.setNewId();
-    this.setNewOrderId();
     this.image = "";
     this.parentCats = [];
 
     this.createValidationRules();
-        
+
     this.loading = false;
   }
 
   async levelChanged(newVal) {
     this.parentCats = [];
 
-    if (newVal > 0) {      
+    if (newVal > 0) {
       // get parent categories
       let cats = await this.categoryService.getCategoriesByLevel(newVal - 1);
-      
+
       if (cats) {
         cats.forEach(x => this.parentCats.push({ id: x.id, name: x.name }));
       }
@@ -79,8 +76,8 @@ export class AddCategory {
       .required()
       .withMessageKey('errors:addCategoryNameRequired')
       .then()
-      .satisfies(async(value: any, object: AddCategory) => {        
-        let catExists = await this.categoryAlreadyExists(value, object.level);        
+      .satisfies(async (value: any, object: AddCategoryProposal) => {
+        let catExists = await this.categoryAlreadyExists(value, object.level);
         return !catExists;
       })
       .withMessageKey('errors:addCategoryNameExists')
@@ -90,21 +87,15 @@ export class AddCategory {
       .ensure('parentId')
       .required()
       .withMessageKey('errors:addCategoryParentRequired')
+      .ensure('from')
+      .required()
+      .withMessageKey('errors:addCategoryProposalFromRequired')
+      .ensure('message')
+      .maxLength(255)
+      .withMessageKey('errors:addCategoryProposalMessageMaxLength')
       .rules;
 
     this.validationController.addObject(this, rules);
-  }
-
-  get canSave() {
-    return this.name && this.level >= 0 && (this.level > 0 ? this.parentId : true);
-  }
-
-  async setNewId() {
-    this.id = await this.categoryService.generateNewCategoryId();
-  }
-
-  async setNewOrderId() {
-    this.orderId = await this.categoryService.generateNewOrderId();
   }
 
   async save() {
@@ -120,34 +111,38 @@ export class AddCategory {
       if (!result.valid) {
         const toast = new ToastMessage();
 
-        toast.message = i18n.tr(result.rule.messageKey, {          
+        toast.message = i18n.tr(result.rule.messageKey, {
           ns: 'errors'
         });
 
-        this.toast.error(toast);        
+        this.toast.error(toast);
       }
     }
 
     if (validationResult.valid) {
       let cat = {
-        id: parseInt(this.id),
+        from: this.from,
         name: this.name,
         level: parseInt(this.level),
         parentId: parseInt(this.parentId),
         restricted: this.restricted,
         image: this.image,
-        orderId: parseInt(this.orderId),
-        enabled: this.enabled
-      } as ICategory;
+        timestamp: moment().unix(),
+        message: this.message,
+        status: "Awaiting approval",
+        handledBy: "",
+        handlingTimestamp: 0,
+        handlerMessage: ""
+      } as ICategoryProposal;
 
-      let addResult = await this.categoryService.addCategory(cat);
-      
+      let addResult = await this.categoryService.addCategoryProposal(cat);
+
       if (addResult) {
-        router.navigateToRoute('categories', { level: cat.level });
+        router.navigateToRoute('category-proposals');
       }
     }
 
-    loading = false;    
+    loading = false;
   }
 
 }
