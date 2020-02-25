@@ -5,15 +5,17 @@ import { CategoryService } from 'services/category-service';
 import { BootstrapFormRenderer } from 'resources/bootstrap-form-renderer';
 import { I18N } from 'aurelia-i18n';
 import { AppRouter } from 'aurelia-router';
+import * as slugify from 'slugify';
 
 @autoinject()
-export class EditCategory {
+export class AddCategory {
   routeConfig;
 
-  private name;
+  @bindable name;
+  @bindable nameSlug;
   private parentId;
   @bindable level;
-  private parentCats: ICategory[];
+  private parentCats : ICategory[];
   private restricted;
   private image;
   private orderId;
@@ -32,40 +34,35 @@ export class EditCategory {
   }
 
   activate(params, routeConfig) {
-    this.id = params.id;
+    this.parentId = 0;
+    this.level = 0;
+    this.restricted = false;
+    this.enabled = true;
   }
 
   async bind() {
     this.loading = true;   
 
-    let cat = await this.categoryService.getCategoryById(this.id);
-    
-    this.name = cat.name;
-    this.level = cat.level.toString();
-    this.enabled = cat.enabled;
-    
-    this.restricted = cat.restricted;
-    this.orderId = cat.orderId;
-    this.image = cat.image;
-    if(this.level > 0)
-      this.parentCats = await this.categoryService.getCategoriesByLevel(this.level - 1);
-    else
-      this.parentCats = [];
-
-    this.parentId = cat.parentId;
+    this.setNewId();
+    this.setNewOrderId();
+    this.image = "";
+    this.parentCats = [];
 
     this.createValidationRules();
         
     this.loading = false;
   }
 
-  async levelChanged(newVal) {
+  async nameChanged(newVal) {
+    this.nameSlug = slugify.default(newVal);
+  }
 
+  async levelChanged(newVal) {
     this.parentCats = [];
 
     if (newVal > 0) {      
       // get parent categories
-      let cats = await this.categoryService.getCategoriesByLevel(newVal - 1);
+      let cats = await this.categoryService.getCategoriesByLevel(newVal - 1, "name");
       
       if (cats) {
         cats.forEach(x => this.parentCats.push({ id: x.id, name: x.name }));
@@ -73,8 +70,17 @@ export class EditCategory {
     }
   }
 
-  async categoryAlreadyExists(name, level, id) {
-    let cats = await this.categoryService.getCategoriesByNameAndLevel(name, level, id)
+  async categoryAlreadyExists(name, level) {
+    let cats = await this.categoryService.getCategoriesByNameAndLevel(name, level)
+    if (cats && cats.length > 0) {
+      return true;
+    }
+
+    return false;
+  }
+
+  async categorySlugAlreadyExists(name, level) {
+    let cats = await this.categoryService.getCategoriesBySlugAndLevel(name, level)
     if (cats && cats.length > 0) {
       return true;
     }
@@ -88,11 +94,20 @@ export class EditCategory {
       .required()
       .withMessageKey('errors:addCategoryNameRequired')
       .then()
-      .satisfies(async (value: any, object: EditCategory) => {
-        let catExists = await this.categoryAlreadyExists(value, object.level, object.id);        
+      .satisfies(async(value: any, object: AddCategory) => {        
+        let catExists = await this.categoryAlreadyExists(value, object.level);        
         return !catExists;
       })
       .withMessageKey('errors:addCategoryNameExists')
+      .ensure('nameSlug')
+      .required()
+      .withMessageKey('errors:addCategoryNameSlugRequired')
+      .then()
+      .satisfies(async (value: any, object: AddCategory) => {
+        let catExists = await this.categorySlugAlreadyExists(value, object.level);
+        return !catExists;
+      })
+      .withMessageKey('errors:addCategoryNameSlugExists')
       .ensure('level')
       .required()
       .withMessageKey('errors:addCategoryLevelRequired')
@@ -141,6 +156,7 @@ export class EditCategory {
       let cat = {
         id: parseInt(this.id),
         name: this.name,
+        nameSlug: this.nameSlug,
         level: parseInt(this.level),
         parentId: parseInt(this.parentId),
         restricted: this.restricted,
@@ -149,9 +165,9 @@ export class EditCategory {
         enabled: this.enabled
       } as ICategory;
 
-      let updateResult = await this.categoryService.updateCategory(cat);
+      let addResult = await this.categoryService.addCategory(cat);
       
-      if (updateResult) {
+      if (addResult) {
         router.navigateToRoute('categories', { level: cat.level });
       }
     }

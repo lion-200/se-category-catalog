@@ -1,9 +1,11 @@
 ﻿import { autoinject } from 'aurelia-framework';
-import { EventAggregator } from 'aurelia-event-aggregator';
-import { CategoryUpdated, CategoryViewed, CategoryCreated } from '../../messages';
-import { areEqual } from '../../utility';
 import * as firebase from 'firebase';
-import { CategoryService } from '../../services/category-service';
+import { CategoryService } from 'services/category-service';
+import { CategoryProposalService } from 'services/category-proposal-service';
+import { DialogService, DialogCloseResult } from 'aurelia-dialog';
+import { RejectCategoryProposalModal } from 'modals/proposals/reject-category-proposal';
+import { ToastMessage, ToastService } from 'services/toast-service';
+import { I18N } from 'aurelia-i18n';
 
 @autoinject()
 export class CategoryProposals {
@@ -12,7 +14,7 @@ export class CategoryProposals {
   private proposals;
   private selectedId;
 
-  constructor(private categoryService: CategoryService) { }
+  constructor(private toast: ToastService, private i18n: I18N, private categoryService: CategoryService, private categoryProposalService: CategoryProposalService, private dialogService: DialogService) { }
 
   async activate(params) {
     this.level = params.level;
@@ -22,17 +24,65 @@ export class CategoryProposals {
   }
 
   async loadProposals() {
-    this.proposals = await this.categoryService.getCategoryProposals();    
+    this.proposals = await this.categoryProposalService.getCategoryProposals();    
   }
 
   async approve(prop) {
-    await this.categoryService.updateCategoryProposalStatus(prop.key, 'Approved');
-    this.loadProposals();
+    let cats = await this.categoryService.getCategoriesByNameAndLevel(prop.name, prop.level);
+    let catsBySlug = await this.categoryService.getCategoriesBySlugAndLevel(prop.nameSlug, prop.level);
+    
+    if (cats && cats.length > 0 || catsBySlug && catsBySlug.length > 0) {
+      const toast = new ToastMessage();
+
+      toast.message = this.i18n.tr("approveCategoryProposalCategoryAlreadyExists", {
+        name: prop.name,
+        level: prop.level,
+        ns: 'errors'
+      });
+
+      this.toast.error(toast);
+    } else {
+      let cat = await this.mapProposalToCategory(prop);
+      console.log(cat);
+      let addCatResult = await this.categoryService.addCategory(cat);
+      if (addCatResult) {
+        let approveResult = await this.categoryProposalService.updateCategoryProposalStatus(prop.key, 'Approved');
+        if (approveResult)
+          this.loadProposals();
+      }
+    }
+  }
+
+  async mapProposalToCategory(prop) {
+    let newId = await this.categoryService.generateNewCategoryId();
+    let newOrderId = await this.categoryService.generateNewOrderId();
+
+    let cat = {
+      id: newId,
+      name: prop.name,
+      nameSlug: prop.nameSlug,
+      level: parseInt(prop.level),
+      parentId: parseInt(prop.parentId),
+      restricted: prop.restricted,
+      image: prop.image,
+      orderId: newOrderId,
+      enabled: true
+    } as ICategory;
+
+    return cat;
   }
 
   async reject(prop) {
-    await this.categoryService.updateCategoryProposalStatus(prop.key, 'Rejected');
-    this.loadProposals();
+    this.dialogService
+      .open({ viewModel: RejectCategoryProposalModal, model: prop })
+      .whenClosed(x => this.walletDialogCloseResponse(x));
+  }
+
+  async walletDialogCloseResponse(response: DialogCloseResult) {
+    // reload balances if dialog response was success
+    if (!response.wasCancelled) {
+      this.loadProposals();
+    }
   }
 }
 

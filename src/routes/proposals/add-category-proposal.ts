@@ -2,17 +2,20 @@
 import { ValidationControllerFactory, ControllerValidateResult, ValidationRules } from 'aurelia-validation';
 import { ToastService, ToastMessage } from 'services/toast-service';
 import { CategoryService } from 'services/category-service';
+import { CategoryProposalService } from 'services/category-proposal-service';
 import { BootstrapFormRenderer } from 'resources/bootstrap-form-renderer';
 import { I18N } from 'aurelia-i18n';
 import { AppRouter } from 'aurelia-router';
 import moment from 'moment';
+import * as slugify from 'slugify';
 
 @autoinject()
 export class AddCategoryProposal {
   routeConfig;
 
   private from;
-  private name;
+  @bindable name;
+  @bindable nameSlug;
   private parentId;
   @bindable level;
   private parentCats: ICategory[];
@@ -24,7 +27,7 @@ export class AddCategoryProposal {
   private renderer;
   private loading = false;
 
-  constructor(private toast: ToastService, private categoryService: CategoryService, private controllerFactory: ValidationControllerFactory, private i18n: I18N, private router: AppRouter) {
+  constructor(private toast: ToastService, private categoryService: CategoryService, private categoryProposalService: CategoryProposalService, private controllerFactory: ValidationControllerFactory, private i18n: I18N, private router: AppRouter) {
     this.validationController = controllerFactory.createForCurrentScope();
 
     this.renderer = new BootstrapFormRenderer();
@@ -41,6 +44,7 @@ export class AddCategoryProposal {
     this.loading = true;
 
     this.image = "";
+    this.message = "";
     this.parentCats = [];
 
     this.createValidationRules();
@@ -53,7 +57,7 @@ export class AddCategoryProposal {
 
     if (newVal > 0) {
       // get parent categories
-      let cats = await this.categoryService.getCategoriesByLevel(newVal - 1);
+      let cats = await this.categoryService.getCategoriesByLevel(newVal - 1, "name");
 
       if (cats) {
         cats.forEach(x => this.parentCats.push({ id: x.id, name: x.name }));
@@ -61,8 +65,30 @@ export class AddCategoryProposal {
     }
   }
 
+  async nameChanged(newVal) {
+    this.nameSlug = slugify.default(newVal);
+  }
+
   async categoryAlreadyExists(name, level) {
     let cats = await this.categoryService.getCategoriesByNameAndLevel(name, level)
+    if (cats && cats.length > 0) {
+      return true;
+    }
+
+    return false;
+  }
+
+  async categorySlugAlreadyExists(name, level) {
+    let cats = await this.categoryService.getCategoriesBySlugAndLevel(name, level)
+    if (cats && cats.length > 0) {
+      return true;
+    }
+
+    return false;
+  }
+
+  async proposalAlreadyExists(name, level) {
+    let cats = await this.categoryProposalService.getCategoryProposalsByNameAndLevel(name, level)
     if (cats && cats.length > 0) {
       return true;
     }
@@ -81,6 +107,21 @@ export class AddCategoryProposal {
         return !catExists;
       })
       .withMessageKey('errors:addCategoryNameExists')
+      .then()
+      .satisfies(async (value: any, object: AddCategoryProposal) => {
+        let propExists = await this.proposalAlreadyExists(value, object.level);
+        return !propExists;
+      })
+      .withMessageKey('errors:addCategoryProposalNameExists')
+      .ensure('nameSlug')
+      .required()
+      .withMessageKey('errors:addCategoryNameSlugRequired')
+      .then()
+      .satisfies(async (value: any, object: AddCategoryProposal) => {
+        let catExists = await this.categorySlugAlreadyExists(value, object.level);
+        return !catExists;
+      })
+      .withMessageKey('errors:addCategoryNameSlugExists')
       .ensure('level')
       .required()
       .withMessageKey('errors:addCategoryLevelRequired')
@@ -112,6 +153,8 @@ export class AddCategoryProposal {
         const toast = new ToastMessage();
 
         toast.message = i18n.tr(result.rule.messageKey, {
+          name: this.name,
+          level: this.level,
           ns: 'errors'
         });
 
@@ -123,6 +166,7 @@ export class AddCategoryProposal {
       let cat = {
         from: this.from,
         name: this.name,
+        nameSlug: this.nameSlug,
         level: parseInt(this.level),
         parentId: parseInt(this.parentId),
         restricted: this.restricted,
@@ -135,7 +179,7 @@ export class AddCategoryProposal {
         handlerMessage: ""
       } as ICategoryProposal;
 
-      let addResult = await this.categoryService.addCategoryProposal(cat);
+      let addResult = await this.categoryProposalService.addCategoryProposal(cat);
 
       if (addResult) {
         router.navigateToRoute('category-proposals');

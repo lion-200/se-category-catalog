@@ -10,5 +10,9 @@
   "addCategoryProposalFailure": "Failed to add category proposal {{name}} with level {{level}}",
   "addCategoryProposalMessageMaxLength": "Max length reached for message field",
   "categoryProposalNotFound": "Category proposal not found",
-  "categoryProposalStatusChangeFailure":  "Category proposal status change failed"
+  "categoryProposalStatusChangeFailure": "Category proposal status change failed",
+  "addCategoryProposalNameExists": "There is already a proposal with name {{name}} and level {{level}}",
+  "approveCategoryProposalCategoryAlreadyExists": "There is already a category with name: {{name}} at level {{level}}",
+  "addCategoryNameSlugRequired": "SEO friendly name required",
+  "addCategoryNameSlugExists": "This SEO friendly name is already used for another category at the same level"
 }

@@ -8,6 +8,8 @@ import './styles/toast.css';
 import './styles/main.css';
 import './styles/navbar.css';
 
+import modalCss from './styles/modal.css';
+
 import { initFirebase } from './common/firebase';
 
 import { AppRouter } from 'aurelia-router';
@@ -23,6 +25,7 @@ import { ValidationMessageProvider } from 'aurelia-validation';
 export async function configure(aurelia: Aurelia) {
   aurelia.use
     .standardConfiguration()
+    .feature(PLATFORM.moduleName('resources/index'))
     .feature(PLATFORM.moduleName('components/index'));
 
   aurelia.use.developmentLogging(environment.debug ? 'debug' : 'warn');
@@ -32,6 +35,12 @@ export async function configure(aurelia: Aurelia) {
   }
 
   aurelia.use.plugin(PLATFORM.moduleName('aurelia-validation'));
+
+  aurelia.use.plugin(PLATFORM.moduleName('aurelia-dialog'), config => {
+    config
+      .useDefaults()
+      .useCSS(modalCss.toString());
+  });
 
   aurelia.use.plugin(PLATFORM.moduleName('aurelia-i18n'), (instance) => {
     const aliases = ['t', 'i18n'];

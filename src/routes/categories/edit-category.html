@@ -1,7 +1,7 @@
 <template>
   <div class="main-content">
     <div class="no-selection text-center">
-      <h2>Add category</h2>
+      <h2>Edit category</h2>
     </div>
 
     <loader mode="tiny" loading.bind="loading"></loader>
@@ -41,6 +41,22 @@
     <div class="form-group">
       <div class="row">
         <div class="col-sm-3">
+          <label>Parent: </label>
+        </div>
+        <div class="col-sm-6">
+          <select2>
+            <select value.bind="parentId & validate" class="form-control">
+              <option if.bind="level === 0" value="0">No parent</option>
+              <option repeat.for="pCat of parentCats" model.bind="pCat.id">${pCat.name}</option>
+            </select>
+          </select2>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <div class="row">
+        <div class="col-sm-3">
           <label>Category name: </label>
         </div>
         <div class="col-sm-6">
@@ -56,15 +72,14 @@
     <div class="form-group">
       <div class="row">
         <div class="col-sm-3">
-          <label>Parent: </label>
+          <label>SEO friendly name: </label>
         </div>
         <div class="col-sm-6">
-          <select2>
-            <select value.bind="parentId & validate" class="form-control chosen-select">
-              <option if.bind="level == 0" value="0">No parent</option>
-              <option repeat.for="pCat of parentCats" model.bind="pCat.id">${pCat.name}</option>
-            </select>
-          </select2>
+          <div class="input-group">
+            <input type="text" class="form-control"
+                   placeholder=""
+                   value.bind="nameSlug & validate" />
+          </div>
         </div>
       </div>
     </div>

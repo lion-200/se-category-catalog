@@ -14,10 +14,31 @@ export class CategoryService {
     this.db = firebase.firestore();
   }  
 
-  async getCategoriesByNameAndLevel(name, level, id) {    
+  async getCategoriesByNameAndLevel(name, level, id = null) {    
     let categories = this.db.collection('categories');
 
     let list = categories.where("level", "==", parseInt(level)).where("name", "==", name);
+
+    // as != is not supported we check for id's greater than and less then current id to see if the name already exists
+    if (id) {
+      list = list.where("id", "<", id).where("id", ">", id);
+    }
+
+    let cats = [];
+
+    await list.get().then(function (querySnapshot) {
+      querySnapshot.forEach(function (doc) {
+        cats.push(doc.data());
+      });
+    });
+
+    return cats;
+  }
+
+  async getCategoriesBySlugAndLevel(nameSlug, level, id = null) {
+    let categories = this.db.collection('categories');
+
+    let list = categories.where("level", "==", parseInt(level)).where("nameSlug", "==", nameSlug);
 
     // as != is not supported we check for id's greater than and less then current id to see if the name already exists
     if (id) {
@@ -158,10 +179,21 @@ export class CategoryService {
     return cat;
   }
 
-  async getCategoriesByLevel(level, includeParentData = false) {
+  async disableCategory(catId) {
+    let cat = await this.getCategoryById(catId);
+
+  }
+
+  async getCategoriesByLevel(level, orderCol = "orderId", includeParentData = false, includeDisabledCategories = false) {
     const categoryPrefix = this.categoryPrefix;
     let catCol = this.db.collection("categories");
     let list = catCol.where("level", "==", parseInt(level));
+
+    if (!includeDisabledCategories)
+      list = list.where("enabled", "==", true);
+
+    if (orderCol == "orderId" || orderCol == "name")
+      list = list.orderBy(orderCol, "asc");
 
     let cats = [];
 
@@ -181,123 +213,5 @@ export class CategoryService {
     });
 
     return cats;
-  }
-
-  async getCategoryProposals() {
-    let proposals = this.db.collection('categoryProposals');
-    let props = [];
-
-    await proposals.get().then(function (querySnapshot) {
-      querySnapshot.forEach(function (doc) {
-        let prop = doc.data();
-        prop.key = doc.id;
-        prop.timestamp_string = moment.unix(prop.timestamp).format('YYYY-MM-DD HH:mm');
-        if (prop.handlingTimestamp) {
-          prop.handlingTimestamp_string = moment.unix(prop.timestamp).format('YYYY-MM-DD HH:mm');
-        }        
-        props.push(prop);
-      });
-    });
-
-    return props;
-  }
-
-  async addCategoryProposal(proposal) {
-    const i18n = this.i18n;
-    const toastService = this.toast;
-
-    let newCat = this.db.collection("categoryProposals").doc();
-
-    return newCat.set(proposal).then(function () {
-      const toast = new ToastMessage();
-
-      toast.message = i18n.tr('addCategoryProposalSuccess', {
-        name: proposal.name,
-        level: proposal.level,
-        ns: 'notifications'
-      });
-
-      toastService.success(toast);
-
-      return true;
-    }).catch(function (error) {
-      console.log(error);
-      const toast = new ToastMessage();
-
-      toast.message = i18n.tr('addCategoryProposalFailure', {
-        name: proposal.name,
-        level: proposal.level,
-        ns: 'errors'
-      });
-
-      toastService.error(toast);
-
-      return false;
-    });
-  }
-
-  async getCategoryProposalByKey(key) {
-    const i18n = this.i18n;
-    const toastService = this.toast;
-
-    let catCol = this.db.collection("categoryProposals");
-    let catQ = catCol.doc(key);
-    let cat;
-    await catQ.get().then(function (doc) {
-      if (doc.exists) {
-        cat = doc.data();
-      } else {
-        const toast = new ToastMessage();
-
-        toast.message = i18n.tr('categoryProposalNotFound', {
-          id: key,
-          ns: 'errors'
-        });
-
-        toastService.error(toast);
-      }
-    });
-
-    return cat;
-  }
-
-  async updateCategoryProposalStatus(key, status) {
-    const i18n = this.i18n;
-    const toastService = this.toast;
-
-    let prop = await this.getCategoryProposalByKey(key);
-    prop.status = status;
-    prop.handledBy = "lion200";
-    prop.handlingTimestamp = moment().unix();
-
-    let proposals = this.db.collection("categoryProposals").doc(key);
-
-    return proposals.set(prop).then(function () {
-      const toast = new ToastMessage();
-
-      toast.message = i18n.tr('categoryProposalStatusChange', {
-        name: prop.name,
-        level: prop.level,
-        status: prop.status,
-        ns: 'notifications'
-      });
-
-      toastService.success(toast);
-
-      return true;
-    }).catch(function (error) {
-      console.log(error);
-      const toast = new ToastMessage();
-
-      toast.message = i18n.tr('categoryProposalStatusChangeFailure', {
-        name: prop.name,
-        level: prop.level,
-        ns: 'errors'
-      });
-
-      toastService.error(toast);
-
-      return false;
-    });
   }
 }
