@@ -1,6 +1,6 @@
 {
-  "name": "contact-manager",
-  "description": "An Aurelia client application.",
+  "name": "se-category-catalog",
+  "description": "SE Category Catalog",
   "version": "0.1.0",
   "repository": {
     "type": "???",
@@ -77,7 +77,7 @@
   },
   "scripts": {
     "build": "au build",
-    "start": "au run",
+    "start": "au run ./app",
     "test": "au test"
   },
   "engines": {
