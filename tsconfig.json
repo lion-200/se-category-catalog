@@ -7,20 +7,29 @@
     "removeComments": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
+    "resolveJsonModule": true,
     "sourceMap": true,
-    "target": "es5",
+    "target": "es2018",
     "lib": [
-      "es2015",
+      "esnext",
       "dom"
     ],
+    "paths": {
+      "*": [
+        "src/*"
+      ]
+    },
     "moduleResolution": "node",
-    "baseUrl": "src",
+    "baseUrl": ".",
     "allowJs": true
   },
-  "include": [
-    "./src/**/*.ts",
-    "./test/**/*.ts",
-    "./types/**/*.d.ts"
+  "exclude": [
+    "node_modules",
+    "aurelia_project/**/*.json",
+    "x-scratch",
+    "dist",
+    "coverage",
+    "test/e2e"
   ],
   "atom": {
     "rewriteTsconfig": false

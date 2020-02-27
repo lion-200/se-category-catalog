@@ -21,6 +21,18 @@
           <li class="nav-item" repeat.for="row of router.navigation">
             <a class="nav-link" href.bind="row.href"><i if.bind="row.title == 'Add category' || row.title == 'Add proposal'" class="fa fa-plus"></i> ${row.title & t}</a>
           </li>
+
+          <!--<li class="nav-item active" if.bind="!loggedIn">
+            <a class="btn nav-link" click.delegate="signin()">${'Sign In' & t}</a>
+          </li>
+          <li else class="nav-item dropdown active">
+            <a class="nav-link dropdown-toggle" href="javascript:void(0);" id="userDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              ${state.account.name}
+            </a>
+            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="userDropdown">
+              <a class="dropdown-item" href="javascript:void(0);" click.delegate="logout()">${'Logout' & t}</a>
+            </div>
+          </li>-->
         </ul>
       </div>
     </div>

@@ -1,6 +1,7 @@
 import {Aurelia} from 'aurelia-framework'
-import environment from './environment';
+import { environment } from './environment';
 import { PLATFORM } from 'aurelia-pal';
+import { initialState } from './store/state';
 import 'bootstrap/dist/css/bootstrap.css';
 import 'font-awesome/css/font-awesome.css';
 import 'izitoast/dist/css/iziToast.css';
@@ -10,7 +11,7 @@ import './styles/navbar.css';
 
 import modalCss from './styles/modal.css';
 
-import { initFirebase } from './common/firebase';
+import { authStateChanged } from './common/firebase';
 
 import { AppRouter } from 'aurelia-router';
 
@@ -34,7 +35,16 @@ export async function configure(aurelia: Aurelia) {
     aurelia.use.plugin(PLATFORM.moduleName('aurelia-testing'));
   }
 
+  aurelia.use.plugin(PLATFORM.moduleName('aurelia-fetch-client'));
   aurelia.use.plugin(PLATFORM.moduleName('aurelia-validation'));
+
+  aurelia.use.plugin(PLATFORM.moduleName('aurelia-store', 'store'), {
+    initialState: initialState,
+    history: {
+      undoable: false,
+      limit: 5
+    }
+  });
 
   aurelia.use.plugin(PLATFORM.moduleName('aurelia-dialog'), config => {
     config
@@ -86,7 +96,7 @@ export async function configure(aurelia: Aurelia) {
     return i18n.tr(propertyName);
   };
 
-  await initFirebase();
+  await authStateChanged();
 
   await aurelia.start();
   await aurelia.setRoot(PLATFORM.moduleName('app'));
