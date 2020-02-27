@@ -1,5 +1,5 @@
 {
-  "name": "contact-manager",
+  "name": "se-category-catalog",
   "type": "project:application",
   "paths": {
     "root": "src",
